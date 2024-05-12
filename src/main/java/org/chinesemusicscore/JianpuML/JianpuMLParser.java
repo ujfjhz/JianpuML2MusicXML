@@ -163,6 +163,11 @@ public class JianpuMLParser{
             String[] parts = jianpuNote.split("/");
             jianpuPitch = parts[0];
             divide = parts[1];
+            if(divide.contains(".")){
+                EmptyPlacement dot = new EmptyPlacement();
+                note.getDot().add(dot);
+                divide = divide.replaceAll("\\.","");
+            }
             duration = 16 / Integer.parseInt(divide);
         }
         note.setDuration(BigDecimal.valueOf(duration));
