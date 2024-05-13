@@ -48,7 +48,6 @@ public class JianpuMLParser{
         arranger.setValue("ChineseMusicScore");
         identification.getCreator().add(arranger);
 
-        // 添加版权声明
         TypedText right = new TypedText();
         right.setValue("by ChineseMusicScore(MIT License)");
         identification.getRights().add(right);
@@ -59,15 +58,12 @@ public class JianpuMLParser{
     private Attributes createAttributes(Map<String,String> metaData){
         Attributes attributes = new Attributes();
         ObjectFactory factory = new ObjectFactory();
-        // 设置 divisions
         attributes.setDivisions(new BigDecimal("4"));
 
-        // 设置 Key
         Key key = new Key();
         key.setFifths(BigInteger.valueOf(2));//todo hardcode
         attributes.getKey().add(key);
 
-        // 设置 Time
         Time time = new Time();
         String timeSignature = metaData.get("TimeSignature");
         String[] split = timeSignature.split("/");
@@ -77,13 +73,39 @@ public class JianpuMLParser{
         time.getTimeSignature().add(timeBeatType);
         attributes.getTime().add(time);
 
-        // 设置 Clef
         Clef clef = new Clef();
         clef.setSign(ClefSign.G);
         clef.setLine(BigInteger.valueOf(2));
         attributes.getClef().add(clef);
 
         return attributes;
+    }
+
+    private Direction createDirection(Map<String,String> metaData){
+        if(!metaData.containsKey("Tempo")){
+            return null;
+        }
+        String tempo = metaData.get("Tempo");
+
+        Direction direction = new Direction();
+        direction.setPlacement(AboveBelow.ABOVE);
+
+        DirectionType directionType = new DirectionType();
+        Metronome metronome = new Metronome();
+
+        metronome.getBeatUnit().add("quarter");
+        PerMinute perMinute = new PerMinute();
+        perMinute.setValue(tempo);
+        metronome.setPerMinute(perMinute);
+        directionType.setMetronome(metronome);
+
+        direction.getDirectionType().add(directionType);
+
+        Sound sound = new Sound();
+        sound.setTempo(BigDecimal.valueOf(Long.parseLong(tempo)));
+        direction.setSound(sound);
+
+        return direction;
     }
 
     public ScorePartwise parseJianpuML(String jianpuML) {
@@ -93,10 +115,10 @@ public class JianpuMLParser{
         scorePartwise.setWork(createWork(metaData));
         scorePartwise.setIdentification(createIdentification(metaData));
 
-        // 创建 Attributes 对象
         Attributes attributes = createAttributes(metaData);
 
-        // 配置部件列表和乐队部分
+        Direction direction = createDirection(metaData);
+
         PartList partList = new PartList();
         scorePartwise.setPartList(partList);
 
@@ -113,6 +135,7 @@ public class JianpuMLParser{
 
         int measureNo = 1;
 
+        ScorePartwise.Part.Measure lastMeasure = null;
         String[] lines = jianpuML.split("\n");
         for (String line : lines) {
             if (Strings.isBlank(line) || line.contains(":")) {
@@ -126,14 +149,16 @@ public class JianpuMLParser{
                 }
 
                 ScorePartwise.Part.Measure measure = new ScorePartwise.Part.Measure();
+                lastMeasure = measure;
                 measure.setNumber(measureNo+"");
                 if(measureNo==1){
                     measure.getNoteOrBackupOrForward().add(attributes);
+                    measure.getNoteOrBackupOrForward().add(direction);
                 }
 
                 String[] notes = measureStr.trim().split("\\s+");
                 for (String noteString : notes) {
-                    Note note = convertJianpuNote(noteString);
+                    Note note = convertJianpuNote(noteString, metaData.getOrDefault("DefaultNoteDivide", "4"));
                     if (note != null) {
                         measure.getNoteOrBackupOrForward().add(note);
                     }
@@ -144,12 +169,23 @@ public class JianpuMLParser{
             }
         }
 
+        if(lastMeasure!=null) {
+            Barline barline = new Barline();
+            barline.setLocation(RightLeftMiddle.RIGHT);
+
+            BarStyleColor barStyleColor = new BarStyleColor();
+            barStyleColor.setValue(BarStyle.LIGHT_HEAVY);
+            barline.setBarStyle(barStyleColor);
+
+            lastMeasure.getNoteOrBackupOrForward().add(barline);
+        }
+
         scorePartwise.getPart().add(part);
 
         return scorePartwise;
     }
 
-    private Note convertJianpuNote(String jianpuNote) {
+    private Note convertJianpuNote(String jianpuNote, String defaultNoteDivide) {
         if (jianpuNote.isEmpty()) {
             return null;
         }
@@ -158,56 +194,63 @@ public class JianpuMLParser{
 
         double duration = 4; // default duration for quarter
         String jianpuPitch = jianpuNote;
-        String divide = "4";
+        if(Strings.isBlank(defaultNoteDivide)) {
+            defaultNoteDivide = "4";
+        }
         if (jianpuNote.contains("/")) {
             String[] parts = jianpuNote.split("/");
             jianpuPitch = parts[0];
-            divide = parts[1];
-            if(divide.contains(".")){
+            defaultNoteDivide = parts[1];
+            if(defaultNoteDivide.contains(".")){
                 EmptyPlacement dot = new EmptyPlacement();
                 note.getDot().add(dot);
-                divide = divide.replaceAll("\\.","");
+                defaultNoteDivide = defaultNoteDivide.replaceAll("\\.","");
             }
-            duration = 16 / Integer.parseInt(divide);
+            duration = 16 / Integer.parseInt(defaultNoteDivide);
         }
         note.setDuration(BigDecimal.valueOf(duration));
-        NoteType noteType = NoteTypeUtil.getNoteType(divide);
+        NoteType noteType = NoteTypeUtil.getNoteType(defaultNoteDivide);
         note.setType(noteType);
 
         //set pitch
-        Pitch pitch = new Pitch();
+        if(jianpuPitch.equals("0")){
+            Rest rest = new Rest();
+            note.setRest(rest);
+        }else {
+            Pitch pitch = new Pitch();
 
-        if (jianpuPitch.matches("\\d[#b]?")) {
-            if (jianpuPitch.contains("#")) {
-                pitch.setAlter(new BigDecimal("1"));
-            } else if (jianpuPitch.contains("b")) {
-                pitch.setAlter(new BigDecimal("-1"));
+            if (jianpuPitch.matches("\\d[#b]?")) {
+                if (jianpuPitch.contains("#")) {
+                    pitch.setAlter(new BigDecimal("1"));
+                } else if (jianpuPitch.contains("b")) {
+                    pitch.setAlter(new BigDecimal("-1"));
+                }
+
+                jianpuPitch = jianpuPitch.replaceFirst("[#b]", "");
             }
 
-            jianpuPitch = jianpuPitch.replaceFirst("[#b]","");
-        }
-
-        int octave = 4;
-        if (jianpuPitch.endsWith(".")) {
-            octave = octave + (jianpuPitch.length()-1);
-            jianpuPitch = jianpuPitch.substring(0,1);
-        } else if (jianpuPitch.startsWith(".")) {
-            octave = octave - (jianpuPitch.length()-1);
-            jianpuPitch = jianpuPitch.substring(jianpuPitch.length()-1);
-        }
-        pitch.setOctave(octave);
-
-        Pitch stdPitch = DPitchMapping.getPitch(jianpuPitch);
-        pitch.setStep(stdPitch.getStep());
-        if(stdPitch.getAlter()!=null){
-            if(pitch.getAlter()==null){
-                pitch.setAlter(stdPitch.getAlter());
-            }else {
-                pitch.getAlter().add(stdPitch.getAlter());
+            int octave = 4;
+            if (jianpuPitch.endsWith(".")) {
+                octave = octave + (jianpuPitch.length() - 1);
+                jianpuPitch = jianpuPitch.substring(0, 1);
+            } else if (jianpuPitch.startsWith(".")) {
+                octave = octave - (jianpuPitch.length() - 1);
+                jianpuPitch = jianpuPitch.substring(jianpuPitch.length() - 1);
             }
-        }
+            pitch.setOctave(octave);
 
-        note.setPitch(pitch);
+            Pitch stdPitch = DPitchMapping.getPitch(jianpuPitch);
+            pitch.setStep(stdPitch.getStep());
+            if (stdPitch.getAlter() != null) {
+                if (pitch.getAlter() == null) {
+                    pitch.setAlter(stdPitch.getAlter());
+                } else {
+                    pitch.getAlter().add(stdPitch.getAlter());
+                }
+            }
+
+            note.setPitch(pitch);
+        }
 
         return note;
     }
