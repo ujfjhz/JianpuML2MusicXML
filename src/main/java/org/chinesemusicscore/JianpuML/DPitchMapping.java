@@ -13,32 +13,39 @@ public class DPitchMapping {
     static {
         Pitch d = new Pitch();
         d.setStep(Step.D);
+        d.setOctave(4);
         pitchMap.put("1",d);
 
         Pitch e = new Pitch();
         e.setStep(Step.E);
+        e.setOctave(4);
         pitchMap.put("2",e);
 
         Pitch fShap = new Pitch();
         fShap.setStep(Step.F);
         fShap.setAlter(new BigDecimal("1"));
+        fShap.setOctave(4);
         pitchMap.put("3",fShap);
 
         Pitch g = new Pitch();
         g.setStep(Step.G);
+        g.setOctave(4);
         pitchMap.put("4",g);
 
         Pitch a = new Pitch();
         a.setStep(Step.A);
+        a.setOctave(4);
         pitchMap.put("5",a);
 
         Pitch b = new Pitch();
         b.setStep(Step.B);
+        b.setOctave(4);
         pitchMap.put("6",b);
 
         Pitch cSharp = new Pitch();
         cSharp.setStep(Step.C);
         cSharp.setAlter(new BigDecimal("1"));
+        cSharp.setOctave(5);
         pitchMap.put("7",cSharp);
     }
 

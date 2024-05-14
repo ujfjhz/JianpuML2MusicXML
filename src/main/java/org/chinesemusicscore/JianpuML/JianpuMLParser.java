@@ -148,19 +148,22 @@ public class JianpuMLParser{
                     continue;
                 }
 
+                String[] measureSplit = measureStr.split("&");
                 ScorePartwise.Part.Measure measure = new ScorePartwise.Part.Measure();
-                lastMeasure = measure;
-                measure.setNumber(measureNo+"");
-                if(measureNo==1){
+                measure.setNumber(measureNo + "");
+                if (measureNo == 1) {
                     measure.getNoteOrBackupOrForward().add(attributes);
                     measure.getNoteOrBackupOrForward().add(direction);
                 }
+                lastMeasure = measure;
 
-                String[] notes = measureStr.trim().split("\\s+");
-                for (String noteString : notes) {
-                    Note note = convertJianpuNote(noteString, metaData.getOrDefault("DefaultNoteDivide", "4"));
-                    if (note != null) {
-                        measure.getNoteOrBackupOrForward().add(note);
+                if(measureSplit.length>0) {
+                    String[] notes = measureSplit[0].trim().split("\\s+"); // only support one line
+                    for (String noteString : notes) {
+                        Note note = convertJianpuNote(noteString, metaData.getOrDefault("DefaultNoteDivide", "4"));
+                        if (note != null) {
+                            measure.getNoteOrBackupOrForward().add(note);
+                        }
                     }
                 }
 
@@ -213,6 +216,8 @@ public class JianpuMLParser{
         note.setType(noteType);
 
         //set pitch
+        String[] jpPitchSplit = jianpuPitch.split(",");
+        jianpuPitch = jpPitchSplit[0];
         if(jianpuPitch.equals("0")){
             Rest rest = new Rest();
             note.setRest(rest);
@@ -229,18 +234,18 @@ public class JianpuMLParser{
                 jianpuPitch = jianpuPitch.replaceFirst("[#b]", "");
             }
 
-            int octave = 4;
+            int octaveDiff = 0;
             if (jianpuPitch.endsWith(".")) {
-                octave = octave + (jianpuPitch.length() - 1);
+                octaveDiff = (jianpuPitch.length() - 1);
                 jianpuPitch = jianpuPitch.substring(0, 1);
             } else if (jianpuPitch.startsWith(".")) {
-                octave = octave - (jianpuPitch.length() - 1);
+                octaveDiff = - (jianpuPitch.length() - 1);
                 jianpuPitch = jianpuPitch.substring(jianpuPitch.length() - 1);
             }
-            pitch.setOctave(octave);
 
             Pitch stdPitch = DPitchMapping.getPitch(jianpuPitch);
             pitch.setStep(stdPitch.getStep());
+            pitch.setOctave(stdPitch.getOctave()+octaveDiff);
             if (stdPitch.getAlter() != null) {
                 if (pitch.getAlter() == null) {
                     pitch.setAlter(stdPitch.getAlter());
