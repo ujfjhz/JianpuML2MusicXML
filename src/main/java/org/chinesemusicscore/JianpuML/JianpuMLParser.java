@@ -160,7 +160,7 @@ public class JianpuMLParser{
                 if(measureSplit.length>0) {
                     String[] notes = measureSplit[0].trim().split("\\s+"); // only support one line
                     for (String noteString : notes) {
-                        Note note = convertJianpuNote(noteString, metaData.getOrDefault("DefaultNoteDivide", "4"));
+                        Note note = convertJianpuNote(noteString, metaData.getOrDefault("DefaultDuration", "4"));
                         if (note != null) {
                             measure.getNoteOrBackupOrForward().add(note);
                         }
