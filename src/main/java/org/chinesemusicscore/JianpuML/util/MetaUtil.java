@@ -44,7 +44,7 @@ public class MetaUtil {
         identification.getCreator().add(arranger);
 
         TypedText right = new TypedText();
-        right.setValue("by ChineseMusicScore(MIT License)");
+        right.setValue("by ChineseMusicScore (CC BY-NC-SA 4.0)");
         identification.getRights().add(right);
 
         return identification;
