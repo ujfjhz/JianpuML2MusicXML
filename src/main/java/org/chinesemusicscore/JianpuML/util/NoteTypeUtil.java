@@ -1,4 +1,4 @@
-package org.chinesemusicscore.JianpuML;
+package org.chinesemusicscore.JianpuML.util;
 
 import org.apache.logging.log4j.util.Strings;
 import org.audiveris.proxymusic.NoteType;
