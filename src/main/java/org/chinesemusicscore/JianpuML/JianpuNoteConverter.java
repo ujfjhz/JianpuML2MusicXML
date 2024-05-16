@@ -1,15 +1,14 @@
 package org.chinesemusicscore.JianpuML;
 
-import org.apache.logging.log4j.util.Strings;
 import org.audiveris.proxymusic.*;
-import org.chinesemusicscore.JianpuML.pitchmapping.DPitchMapping;
+import org.chinesemusicscore.JianpuML.pitchmapping.*;
 import org.chinesemusicscore.JianpuML.util.NoteTypeUtil;
 
 import java.lang.String;
 import java.math.BigDecimal;
 
 public class JianpuNoteConverter {
-    public static Note convertJianpuNote(String jianpuNote, String defaultNoteDuration) {
+    public static Note convertJianpuNote(String jpKey, String jianpuNote, String defaultNoteDuration) {
         if (jianpuNote.isEmpty()) {
             return null;
         }
@@ -61,7 +60,19 @@ public class JianpuNoteConverter {
                 jianpuPitch = jianpuPitch.substring(jianpuPitch.length() - 1);
             }
 
-            Pitch stdPitch = DPitchMapping.getPitch(jianpuPitch);
+            Pitch stdPitch = null;
+            if("D".equalsIgnoreCase(jpKey)){
+                stdPitch = DPitchMapping.getPitch(jianpuPitch);
+            }else if("G".equalsIgnoreCase(jpKey)){
+                stdPitch = GPitchMapping.getPitch(jianpuPitch);
+            }else if("C".equalsIgnoreCase(jpKey)){
+                stdPitch = CPitchMapping.getPitch(jianpuPitch);
+            }else if("F".equalsIgnoreCase(jpKey)){
+                stdPitch = FPitchMapping.getPitch(jianpuPitch);
+            }else if("Bb".equalsIgnoreCase(jpKey)){
+                stdPitch = BbPitchMapping.getPitch(jianpuPitch);
+            }
+
             pitch.setStep(stdPitch.getStep());
             pitch.setOctave(stdPitch.getOctave()+octaveDiff);
             if (stdPitch.getAlter() != null) {

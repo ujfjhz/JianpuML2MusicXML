@@ -56,7 +56,18 @@ public class MetaUtil {
         attributes.setDivisions(new BigDecimal("4"));
 
         Key key = new Key();
-        key.setFifths(BigInteger.valueOf(2));//todo hardcode
+        String[] keySplit = metaData.get("Key").split("\\s+");
+        if("D".equalsIgnoreCase(keySplit[0])){
+            key.setFifths(BigInteger.valueOf(2));
+        }else if("G".equalsIgnoreCase(keySplit[0])){
+            key.setFifths(BigInteger.valueOf(1));
+        }else if("C".equalsIgnoreCase(keySplit[0])){
+            key.setFifths(BigInteger.valueOf(0));
+        }else if("F".equalsIgnoreCase(keySplit[0])){
+            key.setFifths(BigInteger.valueOf(-1));
+        }else if("Bb".equalsIgnoreCase(keySplit[0])){
+            key.setFifths(BigInteger.valueOf(-2));
+        }
         attributes.getKey().add(key);
 
         Time time = new Time();

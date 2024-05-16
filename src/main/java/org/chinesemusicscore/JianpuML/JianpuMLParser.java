@@ -2,14 +2,10 @@ package org.chinesemusicscore.JianpuML;
 import org.apache.logging.log4j.util.Strings;
 import org.audiveris.proxymusic.*;
 import org.audiveris.proxymusic.util.Marshalling;
-import org.chinesemusicscore.JianpuML.pitchmapping.DPitchMapping;
-import org.chinesemusicscore.JianpuML.util.NoteTypeUtil;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.lang.String;
-import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.util.Map;
 
@@ -44,6 +40,7 @@ public class JianpuMLParser{
 
         int measureNo = 1;
 
+        String[] keySplit = metaData.get("Key").split("\\s+");
         ScorePartwise.Part.Measure lastMeasure = null;
         String[] lines = jianpuML.split("\n");
         for (String line : lines) {
@@ -69,7 +66,7 @@ public class JianpuMLParser{
                 if(measureSplit.length>0) {
                     String[] notes = measureSplit[0].trim().split("\\s+"); // only support one line
                     for (String noteString : notes) {
-                        Note note = convertJianpuNote(noteString, defaultDuration);
+                        Note note = convertJianpuNote(keySplit[0], noteString, defaultDuration);
                         if (note != null) {
                             measure.getNoteOrBackupOrForward().add(note);
                         }
