@@ -9,7 +9,7 @@ import java.lang.String;
 import java.nio.file.Files;
 import java.util.Map;
 
-import static org.chinesemusicscore.JianpuML.JianpuNoteConverter.convertJianpuNote;
+import static org.chinesemusicscore.JianpuML.util.JianpuNoteConverter.convertJianpuNote;
 import static org.chinesemusicscore.JianpuML.util.MetaUtil.*;
 
 public class JianpuMLParser{
@@ -93,9 +93,6 @@ public class JianpuMLParser{
 
         return scorePartwise;
     }
-
-
-
 
     public static void main(String[] args) throws Exception {
         File inputfile = new File("input.jml");

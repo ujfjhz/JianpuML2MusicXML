@@ -1,8 +1,6 @@
-package org.chinesemusicscore.JianpuML;
+package org.chinesemusicscore.JianpuML.util;
 
 import org.audiveris.proxymusic.*;
-import org.chinesemusicscore.JianpuML.pitchmapping.*;
-import org.chinesemusicscore.JianpuML.util.NoteTypeUtil;
 
 import java.lang.String;
 import java.math.BigDecimal;
@@ -60,18 +58,7 @@ public class JianpuNoteConverter {
                 jianpuPitch = jianpuPitch.substring(jianpuPitch.length() - 1);
             }
 
-            Pitch stdPitch = null;
-            if("D".equalsIgnoreCase(jpKey)){
-                stdPitch = DPitchMapping.getPitch(jianpuPitch);
-            }else if("G".equalsIgnoreCase(jpKey)){
-                stdPitch = GPitchMapping.getPitch(jianpuPitch);
-            }else if("C".equalsIgnoreCase(jpKey)){
-                stdPitch = CPitchMapping.getPitch(jianpuPitch);
-            }else if("F".equalsIgnoreCase(jpKey)){
-                stdPitch = FPitchMapping.getPitch(jianpuPitch);
-            }else if("Bb".equalsIgnoreCase(jpKey)){
-                stdPitch = BbPitchMapping.getPitch(jianpuPitch);
-            }
+            Pitch stdPitch = JianpuPitchUtil.getPitch(jpKey, jianpuPitch);
 
             pitch.setStep(stdPitch.getStep());
             pitch.setOctave(stdPitch.getOctave()+octaveDiff);
