@@ -1,14 +1,18 @@
 package org.chinesemusicscore.JianpuML.util;
 
 import org.audiveris.proxymusic.*;
+import org.springframework.beans.BeanUtils;
 
 import java.lang.String;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 public class JianpuNoteConverter {
-    public static Note convertJianpuNote(String jpKey, String jianpuNote, String defaultNoteDuration) {
+    public static List<Note> convertJianpuNote(String jpKey, String jianpuNote, String defaultNoteDuration) {
+        List<Note> notes = new ArrayList<>();
         if (jianpuNote.isEmpty()) {
-            return null;
+            return notes;
         }
 
         Note note = new Note();
@@ -30,49 +34,62 @@ public class JianpuNoteConverter {
         NoteType noteType = NoteTypeUtil.getNoteType(noteDuration);
         note.setType(noteType);
 
-        //set pitch
         String[] jpPitchSplit = jianpuPitch.split(",");
-        jianpuPitch = jpPitchSplit[0];
-        if(jianpuPitch.equals("0")){
-            Rest rest = new Rest();
-            note.setRest(rest);
-        }else {
-            Pitch pitch = new Pitch();
+        for(int i=0;i<jpPitchSplit.length;i++){
+            Note tmpNote = new Note();
+            BeanUtils.copyProperties(note, tmpNote);
 
-            if (jianpuPitch.matches("\\d[#b]?")) {
-                if (jianpuPitch.contains("#")) {
-                    pitch.setAlter(new BigDecimal("1"));
-                } else if (jianpuPitch.contains("b")) {
-                    pitch.setAlter(new BigDecimal("-1"));
-                }
-
-                jianpuPitch = jianpuPitch.replaceFirst("[#b]", "");
-            }
-
-            int octaveDiff = 0;
-            if (jianpuPitch.endsWith(".")) {
-                octaveDiff = (jianpuPitch.length() - 1);
-                jianpuPitch = jianpuPitch.substring(0, 1);
-            } else if (jianpuPitch.startsWith(".")) {
-                octaveDiff = - (jianpuPitch.length() - 1);
-                jianpuPitch = jianpuPitch.substring(jianpuPitch.length() - 1);
-            }
-
-            Pitch stdPitch = JianpuPitchUtil.getPitch(jpKey, jianpuPitch);
-
-            pitch.setStep(stdPitch.getStep());
-            pitch.setOctave(stdPitch.getOctave()+octaveDiff);
-            if (stdPitch.getAlter() != null) {
-                if (pitch.getAlter() == null) {
-                    pitch.setAlter(stdPitch.getAlter());
-                } else {
-                    pitch.getAlter().add(stdPitch.getAlter());
+            if(jpPitchSplit[i].equals("0")){
+                Rest rest = new Rest();
+                tmpNote.setRest(rest);
+            }else {
+                Pitch pitch = convert(jpKey, jpPitchSplit[i]);
+                tmpNote.setPitch(pitch);
+                if(i>0){
+                    tmpNote.setChord(new Empty());
                 }
             }
 
-            note.setPitch(pitch);
+            notes.add(tmpNote);
         }
 
-        return note;
+        return notes;
+    }
+
+    private static Pitch convert(String jpKey, String jianpuPitch){
+        Pitch pitch = new Pitch();
+
+        if (jianpuPitch.matches("\\d[#b]?")) {
+            if (jianpuPitch.contains("#")) {
+                pitch.setAlter(new BigDecimal("1"));
+            } else if (jianpuPitch.contains("b")) {
+                pitch.setAlter(new BigDecimal("-1"));
+            }
+
+            jianpuPitch = jianpuPitch.replaceFirst("[#b]", "");
+        }
+
+        int octaveDiff = 0;
+        if (jianpuPitch.endsWith(".")) {
+            octaveDiff = (jianpuPitch.length() - 1);
+            jianpuPitch = jianpuPitch.substring(0, 1);
+        } else if (jianpuPitch.startsWith(".")) {
+            octaveDiff = - (jianpuPitch.length() - 1);
+            jianpuPitch = jianpuPitch.substring(jianpuPitch.length() - 1);
+        }
+
+        Pitch stdPitch = JianpuPitchUtil.getPitch(jpKey, jianpuPitch);
+
+        pitch.setStep(stdPitch.getStep());
+        pitch.setOctave(stdPitch.getOctave()+octaveDiff);
+        if (stdPitch.getAlter() != null) {
+            if (pitch.getAlter() == null) {
+                pitch.setAlter(stdPitch.getAlter());
+            } else {
+                pitch.getAlter().add(stdPitch.getAlter());
+            }
+        }
+
+        return pitch;
     }
 }

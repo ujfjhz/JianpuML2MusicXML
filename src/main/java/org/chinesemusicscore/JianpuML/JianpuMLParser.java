@@ -9,6 +9,7 @@ import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.lang.String;
 import java.nio.file.Files;
+import java.util.List;
 import java.util.Map;
 
 import static org.chinesemusicscore.JianpuML.util.JianpuNoteConverter.convertJianpuNote;
@@ -83,9 +84,9 @@ public class JianpuMLParser{
                 if(measureSplit.length>0) {
                     String[] notes = measureSplit[0].trim().split("\\s+"); // only support one line
                     for (String noteString : notes) {
-                        Note note = convertJianpuNote(keySplit[0], noteString, scorePropertyHelper.getControlVariable().getDefaultDuration());
-                        if (note != null) {
-                            measure.getNoteOrBackupOrForward().add(note);
+                        List<Note> staffNotes = convertJianpuNote(keySplit[0], noteString, scorePropertyHelper.getControlVariable().getDefaultDuration());
+                        for(Note staffNote: staffNotes){
+                            measure.getNoteOrBackupOrForward().add(staffNote);
                         }
                     }
                 }
