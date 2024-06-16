@@ -2,6 +2,8 @@ package org.chinesemusicscore.JianpuML;
 import org.apache.logging.log4j.util.Strings;
 import org.audiveris.proxymusic.*;
 import org.audiveris.proxymusic.util.Marshalling;
+import org.chinesemusicscore.JianpuML.property.ScorePropertyHelper;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
@@ -14,15 +16,16 @@ import static org.chinesemusicscore.JianpuML.util.MetaUtil.*;
 
 public class JianpuMLParser{
     public ScorePartwise parseJianpuML(String jianpuML) {
+        ScorePropertyHelper scorePropertyHelper = new ScorePropertyHelper();
+
         Map<String, String> metaData = getMetaData(jianpuML);
-        String defaultDuration = metaData.getOrDefault("DefaultDuration", "4");
+        for(Map.Entry<String,String> entry: metaData.entrySet()){
+            scorePropertyHelper.refreshProperty(entry.getKey(), entry.getValue());
+        }
 
         ScorePartwise scorePartwise = new ScorePartwise();
-        scorePartwise.setWork(createWork(metaData));
-        scorePartwise.setIdentification(createIdentification(metaData));
-
-        Attributes attributes = createAttributes(metaData);
-        Direction direction = createDirection(metaData);
+        scorePartwise.setWork(createWork(scorePropertyHelper.getWorkProperty()));
+        scorePartwise.setIdentification(createIdentification(scorePropertyHelper.getIdentificationProperty()));
 
         PartList partList = new PartList();
         scorePartwise.setPartList(partList);
@@ -40,11 +43,17 @@ public class JianpuMLParser{
 
         int measureNo = 1;
 
-        String[] keySplit = metaData.get("Key").split("\\s+");
+        String[] keySplit = scorePropertyHelper.getAttributeProperty().getKey().split("\\s+");
         ScorePartwise.Part.Measure lastMeasure = null;
+
         String[] lines = jianpuML.split("\n");
         for (String line : lines) {
-            if (Strings.isBlank(line) || line.contains(":")) {
+            if (Strings.isBlank(line)) {
+                continue;
+            }
+            if (line.contains(":")) {
+                String[] split = line.split(":");
+                scorePropertyHelper.refreshProperty(split[0],split[1]);
                 continue;
             }
 
@@ -57,16 +66,24 @@ public class JianpuMLParser{
                 String[] measureSplit = measureStr.split("&");
                 ScorePartwise.Part.Measure measure = new ScorePartwise.Part.Measure();
                 measure.setNumber(measureNo + "");
-                if (measureNo == 1) {
+
+                if(scorePropertyHelper.isUpdatingAttribute()){
+                    Attributes attributes = createAttributes(scorePropertyHelper.getAttributeProperty());
                     measure.getNoteOrBackupOrForward().add(attributes);
-                    measure.getNoteOrBackupOrForward().add(direction);
+                    scorePropertyHelper.updatedAttribute();
                 }
+                if(scorePropertyHelper.isUpdatingDirection()){
+                    Direction direction = createDirection(scorePropertyHelper.getDirectionProperty());
+                    measure.getNoteOrBackupOrForward().add(direction);
+                    scorePropertyHelper.updatedDirection();
+                }
+
                 lastMeasure = measure;
 
                 if(measureSplit.length>0) {
                     String[] notes = measureSplit[0].trim().split("\\s+"); // only support one line
                     for (String noteString : notes) {
-                        Note note = convertJianpuNote(keySplit[0], noteString, defaultDuration);
+                        Note note = convertJianpuNote(keySplit[0], noteString, scorePropertyHelper.getControlVariable().getDefaultDuration());
                         if (note != null) {
                             measure.getNoteOrBackupOrForward().add(note);
                         }

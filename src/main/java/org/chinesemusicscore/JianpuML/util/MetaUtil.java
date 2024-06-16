@@ -1,6 +1,11 @@
 package org.chinesemusicscore.JianpuML.util;
 
+import org.apache.logging.log4j.util.Strings;
 import org.audiveris.proxymusic.*;
+import org.chinesemusicscore.JianpuML.property.AttributeProperty;
+import org.chinesemusicscore.JianpuML.property.DirectionProperty;
+import org.chinesemusicscore.JianpuML.property.IdentificationProperty;
+import org.chinesemusicscore.JianpuML.property.WorkProperty;
 
 import javax.xml.bind.JAXBElement;
 import java.lang.String;
@@ -24,23 +29,36 @@ public class MetaUtil {
         return metaData;
     }
 
-    public static Work createWork(Map<String,String> metaData){
+    public static Work createWork(WorkProperty workProperty){
         Work work = new Work();
-        work.setWorkTitle(metaData.getOrDefault("Title", "Title"));
+        if(workProperty.getTitle().isBlank()){
+            work.setWorkTitle("Title");
+        }else {
+            work.setWorkTitle(workProperty.getTitle());
+        }
         return work;
     }
 
-    public static Identification createIdentification(Map<String,String> metaData){
+    public static Identification createIdentification(IdentificationProperty identificationProperty){
         Identification identification = new Identification();
 
         TypedText composer = new TypedText();
         composer.setType("composer");
-        composer.setValue(metaData.getOrDefault("Composer", "Composer"));
+        if(Strings.isEmpty(identificationProperty.getComposer())){
+            composer.setValue("Composer");
+        }else {
+            composer.setValue(identificationProperty.getComposer());
+        }
         identification.getCreator().add(composer);
 
         TypedText arranger = new TypedText();
         arranger.setType("arranger");
-        arranger.setValue("ChineseMusicScore");
+        if(Strings.isEmpty(identificationProperty.getArranger())){
+            arranger.setValue("ChineseMusicScore");
+        }else {
+            arranger.setValue(identificationProperty.getArranger());
+        }
+
         identification.getCreator().add(arranger);
 
         TypedText right = new TypedText();
@@ -50,13 +68,13 @@ public class MetaUtil {
         return identification;
     }
 
-    public static Attributes createAttributes(Map<String,String> metaData){
+    public static Attributes createAttributes(AttributeProperty attributeProperty){
         Attributes attributes = new Attributes();
         ObjectFactory factory = new ObjectFactory();
         attributes.setDivisions(new BigDecimal("4"));
 
         Key key = new Key();
-        String[] keySplit = metaData.get("Key").split("\\s+");
+        String[] keySplit = attributeProperty.getKey().split("\\s+");
         if("D".equalsIgnoreCase(keySplit[0])){
             key.setFifths(BigInteger.valueOf(2));
         }else if("G".equalsIgnoreCase(keySplit[0])){
@@ -71,7 +89,7 @@ public class MetaUtil {
         attributes.getKey().add(key);
 
         Time time = new Time();
-        String timeSignature = metaData.get("TimeSignature");
+        String timeSignature = attributeProperty.getTimeSignature();
         String[] split = timeSignature.split("/");
         JAXBElement<String> timeBeats = factory.createTimeBeats(split[0]);
         JAXBElement<String> timeBeatType = factory.createTimeBeatType(split[1]);
@@ -87,11 +105,11 @@ public class MetaUtil {
         return attributes;
     }
 
-    public static Direction createDirection(Map<String,String> metaData){
-        if(!metaData.containsKey("Tempo")){
+    public static Direction createDirection(DirectionProperty directionProperty){
+        String tempo = directionProperty.getTempo();
+        if(tempo.isBlank()){
             return null;
         }
-        String tempo = metaData.get("Tempo");
 
         Direction direction = new Direction();
         direction.setPlacement(AboveBelow.ABOVE);
