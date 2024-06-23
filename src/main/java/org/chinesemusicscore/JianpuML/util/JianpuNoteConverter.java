@@ -15,29 +15,32 @@ public class JianpuNoteConverter {
             return notes;
         }
 
-        Note note = new Note();
-
         String jianpuPitch = jianpuNote;
         String noteDuration = defaultNoteDuration;
+        Boolean dotted = false;
         if (jianpuNote.contains("/")) {
             String[] parts = jianpuNote.split("/");
             jianpuPitch = parts[0];
             noteDuration = parts[1];
             if(noteDuration.contains(".")){
-                EmptyPlacement dot = new EmptyPlacement();
-                note.getDot().add(dot);
+                dotted = true;
                 noteDuration = noteDuration.replaceAll("\\.","");
             }
         }
         double duration = 16 / Integer.parseInt(noteDuration);
-        note.setDuration(BigDecimal.valueOf(duration));
-        NoteType noteType = NoteTypeUtil.getNoteType(noteDuration);
-        note.setType(noteType);
 
         String[] jpPitchSplit = jianpuPitch.split(",");
         for(int i=0;i<jpPitchSplit.length;i++){
             Note tmpNote = new Note();
-            BeanUtils.copyProperties(note, tmpNote);
+
+            tmpNote.setDuration(BigDecimal.valueOf(duration));
+            NoteType noteType = NoteTypeUtil.getNoteType(noteDuration);
+            tmpNote.setType(noteType);
+
+            if(dotted){
+                EmptyPlacement dot = new EmptyPlacement();
+                tmpNote.getDot().add(dot);
+            }
 
             if(jpPitchSplit[i].equals("0")){
                 Rest rest = new Rest();
