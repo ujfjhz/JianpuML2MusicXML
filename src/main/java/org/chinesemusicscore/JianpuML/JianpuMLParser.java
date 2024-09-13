@@ -58,7 +58,7 @@ public class JianpuMLParser{
                 continue;
             }
 
-            String[] measureStrs = line.split("\\|");
+            String[] measureStrs = line.split("[\\|｜]");
             for (String measureStr : measureStrs) {
                 if(Strings.isBlank(measureStr)){
                     continue;

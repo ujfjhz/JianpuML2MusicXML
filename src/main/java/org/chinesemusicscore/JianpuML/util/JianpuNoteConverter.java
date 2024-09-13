@@ -83,7 +83,11 @@ public class JianpuNoteConverter {
 
         Pitch stdPitch = JianpuPitchUtil.getPitch(jpKey, jianpuPitch);
 
-        pitch.setStep(stdPitch.getStep());
+        if(stdPitch!=null) {
+            pitch.setStep(stdPitch.getStep());
+        }else {
+            throw new RuntimeException("invalid pitch "+jianpuPitch);
+        }
         pitch.setOctave(stdPitch.getOctave()+octaveDiff);
         if (stdPitch.getAlter() != null) {
             if (pitch.getAlter() == null) {
