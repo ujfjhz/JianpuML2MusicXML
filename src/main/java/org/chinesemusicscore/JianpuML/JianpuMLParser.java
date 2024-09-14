@@ -1,14 +1,8 @@
 package org.chinesemusicscore.JianpuML;
 import org.apache.logging.log4j.util.Strings;
 import org.audiveris.proxymusic.*;
-import org.audiveris.proxymusic.util.Marshalling;
 import org.chinesemusicscore.JianpuML.property.ScorePropertyHelper;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
 import java.lang.String;
-import java.nio.file.Files;
 import java.util.List;
 import java.util.Map;
 
@@ -110,19 +104,5 @@ public class JianpuMLParser{
         scorePartwise.getPart().add(part);
 
         return scorePartwise;
-    }
-
-    public static void main(String[] args) throws Exception {
-        File inputfile = new File("input.jml");
-        String jianpu = new String(Files.readAllBytes(inputfile.toPath()));
-
-        JianpuMLParser jianpuMLParser = new JianpuMLParser();
-        ScorePartwise scorePartwise = jianpuMLParser.parseJianpuML(jianpu);
-
-        File file = new File("output.musicxml");
-        OutputStream os = new FileOutputStream(file);
-        Marshalling.marshal(scorePartwise, os, false, 4);
-
-        System.out.println("MusicXML file has been created: " + file.getAbsolutePath());
     }
 }

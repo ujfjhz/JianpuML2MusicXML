@@ -1,5 +1,6 @@
 input.jml
 output.musicxml
+output/
 
 HELP.md
 target/
