@@ -30,9 +30,13 @@ public class NoteTypeUtil {
         sixteenth.setValue("16th");
         noteTypeMap.put("16", sixteenth);
 
-        NoteType thirtytwoth = new NoteType();
-        thirtytwoth.setValue("32th");
-        noteTypeMap.put("32", thirtytwoth);
+        NoteType thirtysecond = new NoteType();
+        thirtysecond.setValue("32nd");
+        noteTypeMap.put("32", thirtysecond);
+
+        NoteType sixtyfourth = new NoteType();
+        sixtyfourth.setValue("64th");
+        noteTypeMap.put("64", sixtyfourth);
     }
 
     public static NoteType getNoteType(String divide){

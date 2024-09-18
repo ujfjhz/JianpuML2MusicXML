@@ -27,7 +27,7 @@ public class JianpuNoteConverter {
                 noteDuration = noteDuration.replaceAll("\\.","");
             }
         }
-        double duration = 16 / Integer.parseInt(noteDuration);
+        double duration = 16.0 / Integer.parseInt(noteDuration);
 
         String[] jpPitchSplit = jianpuPitch.split(",");
         for(int i=0;i<jpPitchSplit.length;i++){
