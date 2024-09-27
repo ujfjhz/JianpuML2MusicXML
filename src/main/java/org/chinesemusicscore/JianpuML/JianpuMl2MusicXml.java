@@ -8,6 +8,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
+import java.util.Map;
+
+import static org.chinesemusicscore.JianpuML.util.MetaUtil.getMetaData;
 
 public class JianpuMl2MusicXml {
 
@@ -17,9 +20,9 @@ public class JianpuMl2MusicXml {
 
 		JianpuMLParser jianpuMLParser = new JianpuMLParser();
 		ScorePartwise scorePartwise = jianpuMLParser.parseJianpuML(jianpu);
+		Map<String, String> metaData = getMetaData(jianpu);
 
-		String workName = scorePartwise.getIdentification().getCreator().getFirst().getValue()
-				+ "-" + scorePartwise.getWork().getWorkTitle();
+		String workName = metaData.get("Composer") + "-" + scorePartwise.getWork().getWorkTitle();
 		File outputDir = new File("output", workName);
 		if(outputDir.exists()){
 			outputDir.delete();

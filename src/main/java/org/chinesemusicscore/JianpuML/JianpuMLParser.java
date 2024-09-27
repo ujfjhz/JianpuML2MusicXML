@@ -1,6 +1,7 @@
 package org.chinesemusicscore.JianpuML;
 import org.apache.logging.log4j.util.Strings;
 import org.audiveris.proxymusic.*;
+import org.chinesemusicscore.JianpuML.notation.NotationHelper;
 import org.chinesemusicscore.JianpuML.property.ScorePropertyHelper;
 import java.lang.String;
 import java.util.List;
@@ -12,6 +13,7 @@ import static org.chinesemusicscore.JianpuML.util.MetaUtil.*;
 public class JianpuMLParser{
     public ScorePartwise parseJianpuML(String jianpuML) {
         ScorePropertyHelper scorePropertyHelper = new ScorePropertyHelper();
+        NotationHelper notationHelper = new NotationHelper();
 
         Map<String, String> metaData = getMetaData(jianpuML);
         for(Map.Entry<String,String> entry: metaData.entrySet()){
@@ -42,6 +44,7 @@ public class JianpuMLParser{
         ScorePartwise.Part.Measure lastMeasure = null;
 
         String[] lines = jianpuML.split("\n");
+        Note lastNote = null;
         for (String line : lines) {
             if (Strings.isBlank(line)) {
                 continue;
@@ -57,6 +60,11 @@ public class JianpuMLParser{
                 if(Strings.isBlank(measureStr)){
                     continue;
                 }
+
+                measureStr = measureStr.replace("(", " ( ")
+                        .replace(")", " ) ")
+                        .replace("[", " [ ")
+                        .replace("]", " ] ");
 
                 String[] measureSplit = measureStr.split("&");
                 ScorePartwise.Part.Measure measure = new ScorePartwise.Part.Measure();
@@ -76,11 +84,67 @@ public class JianpuMLParser{
                 lastMeasure = measure;
 
                 if(measureSplit.length>0) {
-                    String[] notes = measureSplit[0].trim().split("\\s+"); // only support one line
+                    String[] notes = measureSplit[0].trim().split("\\s+"); // only support one line currently
                     for (String noteString : notes) {
+                        boolean isNotation = notationHelper.refreshNotation(noteString);
+                        if(isNotation){
+                            if(notationHelper.isSlurStop()){
+                                if(lastNote!=null) {
+                                    Notations notations = new Notations();
+                                    Slur slur = new Slur();
+                                    slur.setType(StartStopContinue.STOP);
+                                    notations.getTiedOrSlurOrTuplet().add(slur);
+                                    lastNote.getNotations().add(notations);
+                                }
+
+                                notationHelper.doneSlurStop();
+                            }
+
+                            if(notationHelper.isTupletStop()){
+                                if(lastNote!=null) {
+                                    Notations notations = new Notations();
+                                    Tuplet tuplet = new Tuplet();
+                                    tuplet.setType(StartStop.STOP);
+                                    notations.getTiedOrSlurOrTuplet().add(tuplet);
+                                    lastNote.getNotations().add(notations);
+
+                                    lastNote.setTimeModification(notationHelper.genTimeModification());
+                                }
+
+                                notationHelper.doneTupletStop();
+                            }
+
+                            continue;
+                        }
+
                         List<Note> staffNotes = convertJianpuNote(keySplit[0], noteString, scorePropertyHelper.getControlVariable().getDefaultDuration());
                         for(Note staffNote: staffNotes){
+                            if(notationHelper.isSlurStart()){
+                                Notations notations = new Notations();
+                                Slur slur = new Slur();
+                                slur.setType(StartStopContinue.START);
+                                notations.getTiedOrSlurOrTuplet().add(slur);
+                                staffNote.getNotations().add(notations);
+
+                                notationHelper.doneSlurStart();
+                            }
+
+                            if(notationHelper.isTupletStart()){
+                                Notations notations = new Notations();
+                                Tuplet tuplet = new Tuplet();
+                                tuplet.setType(StartStop.START);
+                                notations.getTiedOrSlurOrTuplet().add(tuplet);
+                                staffNote.getNotations().add(notations);
+
+                                staffNote.setTimeModification(notationHelper.genTimeModification());
+
+                                notationHelper.doneTupletStart();
+                            }else if(notationHelper.isTupletContinue()){
+                                staffNote.setTimeModification(notationHelper.genTimeModification());
+                            }
+
                             measure.getNoteOrBackupOrForward().add(staffNote);
+                            lastNote = staffNote;
                         }
                     }
                 }

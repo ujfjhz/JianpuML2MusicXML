@@ -1,7 +1,6 @@
 package org.chinesemusicscore.JianpuML.util;
 
 import org.audiveris.proxymusic.*;
-import org.springframework.beans.BeanUtils;
 
 import java.lang.String;
 import java.math.BigDecimal;
@@ -27,14 +26,15 @@ public class JianpuNoteConverter {
                 noteDuration = noteDuration.replaceAll("\\.","");
             }
         }
-        double duration = 16.0 / Integer.parseInt(noteDuration);
+        String divide = NoteTypeUtil.getDivide(noteDuration);
+        double duration = 16.0 / Integer.parseInt(divide);
 
         String[] jpPitchSplit = jianpuPitch.split(",");
         for(int i=0;i<jpPitchSplit.length;i++){
             Note tmpNote = new Note();
 
             tmpNote.setDuration(BigDecimal.valueOf(duration));
-            NoteType noteType = NoteTypeUtil.getNoteType(noteDuration);
+            NoteType noteType = NoteTypeUtil.getNoteType(divide);
             tmpNote.setType(noteType);
 
             if(dotted){

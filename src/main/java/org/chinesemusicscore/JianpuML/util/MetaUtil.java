@@ -42,24 +42,28 @@ public class MetaUtil {
     public static Identification createIdentification(IdentificationProperty identificationProperty){
         Identification identification = new Identification();
 
-        TypedText composer = new TypedText();
-        composer.setType("composer");
-        if(Strings.isEmpty(identificationProperty.getComposer())){
-            composer.setValue("Composer");
-        }else {
-            composer.setValue(identificationProperty.getComposer());
-        }
-        identification.getCreator().add(composer);
-
         TypedText arranger = new TypedText();
         arranger.setType("arranger");
+        String arrangerText;
         if(Strings.isEmpty(identificationProperty.getArranger())){
-            arranger.setValue("ChineseMusicScore");
+            arrangerText = "ChineseMusicScore";
         }else {
-            arranger.setValue(identificationProperty.getArranger());
+            arrangerText = identificationProperty.getArranger();
         }
-
+        arranger.setValue(arrangerText);
         identification.getCreator().add(arranger);
+
+        TypedText composer = new TypedText();
+        composer.setType("composer");
+        String composerText;
+        if(Strings.isEmpty(identificationProperty.getComposer())){
+            composerText = "Composer";
+        }else {
+            composerText = identificationProperty.getComposer();
+        }
+        composer.setValue("Composer: "+composerText+"\nArranger: "+arrangerText);
+
+        identification.getCreator().add(composer);
 
         TypedText right = new TypedText();
         right.setValue("by ChineseMusicScore (CC BY-NC-SA 4.0)");

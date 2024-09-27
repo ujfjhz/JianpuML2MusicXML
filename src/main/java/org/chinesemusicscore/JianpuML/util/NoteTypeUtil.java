@@ -9,6 +9,8 @@ import java.util.Map;
 public class NoteTypeUtil {
     private static Map<String, NoteType> noteTypeMap = new HashMap<>();
 
+    private static Map<String, String> divideMap = new HashMap<>();
+
     static {
         NoteType whole = new NoteType();
         whole.setValue("whole");
@@ -29,14 +31,17 @@ public class NoteTypeUtil {
         NoteType sixteenth = new NoteType();
         sixteenth.setValue("16th");
         noteTypeMap.put("16", sixteenth);
+        divideMap.put("a", "16");
 
         NoteType thirtysecond = new NoteType();
         thirtysecond.setValue("32nd");
         noteTypeMap.put("32", thirtysecond);
+        divideMap.put("b", "32");
 
         NoteType sixtyfourth = new NoteType();
         sixtyfourth.setValue("64th");
         noteTypeMap.put("64", sixtyfourth);
+        divideMap.put("c", "64");
     }
 
     public static NoteType getNoteType(String divide){
@@ -44,6 +49,14 @@ public class NoteTypeUtil {
             return noteTypeMap.get("4");
         }else {
             return noteTypeMap.get(divide);
+        }
+    }
+
+    public static String getDivide(String noteDuration){
+        if(divideMap.containsKey(noteDuration)){
+            return divideMap.get(noteDuration);
+        }else {
+            return noteDuration;
         }
     }
 }
