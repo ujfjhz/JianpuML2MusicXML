@@ -1,5 +1,5 @@
 # JianpuML2MusicXML
-JianpuML2MusicXML is a tool designed to convert JianpuML notation into MusicXML format. 
+JianpuML2MusicXML is a tool designed to convert [JianpuML](https://github.com/ujfjhz/ChineseMusicScore/blob/main/JianpuMLSpecification/JianpuML-Specification.md) notation into MusicXML format. 
 
 Usage:
 
