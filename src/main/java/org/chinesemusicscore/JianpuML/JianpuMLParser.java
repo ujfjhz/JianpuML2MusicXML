@@ -12,6 +12,12 @@ import static org.chinesemusicscore.JianpuML.util.MetaUtil.*;
 
 public class JianpuMLParser{
     public ScorePartwise parseJianpuML(String jianpuML) {
+        jianpuML = jianpuML.replace("｜","|")
+                .replace("（","(")
+                .replace("）",")")
+                .replace("【","[")
+                .replace("】","]");
+
         ScorePropertyHelper scorePropertyHelper = new ScorePropertyHelper();
         NotationHelper notationHelper = new NotationHelper();
 
@@ -55,7 +61,7 @@ public class JianpuMLParser{
                 continue;
             }
 
-            String[] measureStrs = line.split("[\\|｜]");
+            String[] measureStrs = line.split("[\\|]");
             for (String measureStr : measureStrs) {
                 if(Strings.isBlank(measureStr)){
                     continue;
@@ -150,6 +156,7 @@ public class JianpuMLParser{
                 }
 
                 part.getMeasure().add(measure);
+                System.out.println("finished "+measureNo+ " measure: "+ measureStr);
                 measureNo++;
             }
         }
