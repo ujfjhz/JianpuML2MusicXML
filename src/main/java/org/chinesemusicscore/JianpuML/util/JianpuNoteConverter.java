@@ -62,7 +62,7 @@ public class JianpuNoteConverter {
     private static Pitch convert(String jpKey, String jianpuPitch){
         Pitch pitch = new Pitch();
 
-        if (jianpuPitch.matches("\\d[#b]?")) {
+        if (jianpuPitch.matches("\\.*\\d\\.*[#b]?")) {
             if (jianpuPitch.contains("#")) {
                 pitch.setAlter(new BigDecimal("1"));
             } else if (jianpuPitch.contains("b")) {

@@ -51,6 +51,7 @@ public class JianpuMLParser{
 
         String[] lines = jianpuML.split("\n");
         Note lastNote = null;
+        int scoreLineNo = 0;
         for (String line : lines) {
             if (Strings.isBlank(line)) {
                 continue;
@@ -61,11 +62,16 @@ public class JianpuMLParser{
                 continue;
             }
 
+            scoreLineNo++;
+            int scoreLineMeasureNo = 0;
+
             String[] measureStrs = line.split("[\\|]");
             for (String measureStr : measureStrs) {
                 if(Strings.isBlank(measureStr)){
                     continue;
                 }
+                scoreLineMeasureNo++;
+                String origMeasureStr = measureStr;
 
                 measureStr = measureStr.replace("(", " ( ")
                         .replace(")", " ) ")
@@ -156,7 +162,7 @@ public class JianpuMLParser{
                 }
 
                 part.getMeasure().add(measure);
-                System.out.println("finished "+measureNo+ " measure: "+ measureStr);
+                System.out.println("finished "+measureNo+ " measure ("+scoreLineNo+","+scoreLineMeasureNo+"): "+ origMeasureStr);
                 measureNo++;
             }
         }

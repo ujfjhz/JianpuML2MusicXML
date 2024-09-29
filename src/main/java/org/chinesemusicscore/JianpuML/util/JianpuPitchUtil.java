@@ -17,7 +17,9 @@ public class JianpuPitchUtil {
             pitch = FPitchMapping.getPitch(jpPitch);
         }else if("Bb".equalsIgnoreCase(jpKey)){
             pitch = BbPitchMapping.getPitch(jpPitch);
-        }
+        }else if("A".equalsIgnoreCase(jpKey)){
+            pitch = APitchMapping.getPitch(jpPitch);
+        }//TODO more
 
         return pitch;
     }

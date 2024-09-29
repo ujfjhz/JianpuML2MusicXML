@@ -89,7 +89,9 @@ public class MetaUtil {
             key.setFifths(BigInteger.valueOf(-1));
         }else if("Bb".equalsIgnoreCase(keySplit[0])){
             key.setFifths(BigInteger.valueOf(-2));
-        }
+        }else if("A".equalsIgnoreCase(keySplit[0])){
+            key.setFifths(BigInteger.valueOf(3));
+        }//TODO more
         attributes.getKey().add(key);
 
         Time time = new Time();
