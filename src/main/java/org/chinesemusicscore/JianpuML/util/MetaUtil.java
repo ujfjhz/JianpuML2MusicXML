@@ -79,19 +79,39 @@ public class MetaUtil {
 
         Key key = new Key();
         String[] keySplit = attributeProperty.getKey().split("\\s+");
-        if("D".equalsIgnoreCase(keySplit[0])){
-            key.setFifths(BigInteger.valueOf(2));
+
+        if("C".equalsIgnoreCase(keySplit[0])){
+            key.setFifths(BigInteger.valueOf(0));
         }else if("G".equalsIgnoreCase(keySplit[0])){
             key.setFifths(BigInteger.valueOf(1));
-        }else if("C".equalsIgnoreCase(keySplit[0])){
-            key.setFifths(BigInteger.valueOf(0));
+        }else if("D".equalsIgnoreCase(keySplit[0])){
+            key.setFifths(BigInteger.valueOf(2));
+        }else if("A".equalsIgnoreCase(keySplit[0])){
+            key.setFifths(BigInteger.valueOf(3));
+        }else if("E".equalsIgnoreCase(keySplit[0])){
+            key.setFifths(BigInteger.valueOf(4));
+        }else if("B".equalsIgnoreCase(keySplit[0])){
+            key.setFifths(BigInteger.valueOf(5));
+        }else if("F#".equalsIgnoreCase(keySplit[0])){
+            key.setFifths(BigInteger.valueOf(6));
+        }else if("C#".equalsIgnoreCase(keySplit[0])){
+            key.setFifths(BigInteger.valueOf(7));
         }else if("F".equalsIgnoreCase(keySplit[0])){
             key.setFifths(BigInteger.valueOf(-1));
         }else if("Bb".equalsIgnoreCase(keySplit[0])){
             key.setFifths(BigInteger.valueOf(-2));
-        }else if("A".equalsIgnoreCase(keySplit[0])){
-            key.setFifths(BigInteger.valueOf(3));
-        }//TODO more
+        }else if("Eb".equalsIgnoreCase(keySplit[0])){
+            key.setFifths(BigInteger.valueOf(-3));
+        }else if("Ab".equalsIgnoreCase(keySplit[0])){
+            key.setFifths(BigInteger.valueOf(-4));
+        }else if("Db".equalsIgnoreCase(keySplit[0])){
+            key.setFifths(BigInteger.valueOf(-5));
+        }else if("Gb".equalsIgnoreCase(keySplit[0])){
+            key.setFifths(BigInteger.valueOf(-6));
+        }else if("Cb".equalsIgnoreCase(keySplit[0])){
+            key.setFifths(BigInteger.valueOf(-7));
+        }
+
         attributes.getKey().add(key);
 
         Time time = new Time();
