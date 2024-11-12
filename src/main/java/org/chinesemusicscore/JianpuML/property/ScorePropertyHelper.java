@@ -55,6 +55,9 @@ public class ScorePropertyHelper {
         }else if(AttributeProperty.JP_PROP_TimeSignature.equalsIgnoreCase(key)){
             attributeProperty.setTimeSignature(value);
             updating.add("AttributeProperty");
+        }else if(AttributeProperty.JP_PROP_STAFF.equalsIgnoreCase(key)){
+            attributeProperty.setStaff(value);
+            updating.add("AttributeProperty");
         }else if(DirectionProperty.JP_PROP_TEMPO.equalsIgnoreCase(key)){
             directionProperty.setTempo(value);
             updating.add("DirectionProperty");

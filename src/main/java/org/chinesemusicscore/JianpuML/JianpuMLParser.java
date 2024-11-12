@@ -26,6 +26,12 @@ public class JianpuMLParser{
             scorePropertyHelper.refreshProperty(entry.getKey(), entry.getValue());
         }
 
+        boolean isStaff = false;
+        if(scorePropertyHelper.getAttributeProperty().getStaff()!=null
+                && scorePropertyHelper.getAttributeProperty().getStaff().equalsIgnoreCase("true")){
+            isStaff = true;//is staff
+        }
+
         ScorePartwise scorePartwise = new ScorePartwise();
         scorePartwise.setWork(createWork(scorePropertyHelper.getWorkProperty()));
         scorePartwise.setIdentification(createIdentification(scorePropertyHelper.getIdentificationProperty()));
@@ -129,7 +135,7 @@ public class JianpuMLParser{
                             continue;
                         }
 
-                        List<Note> staffNotes = convertJianpuNote(keySplit[0], noteString, scorePropertyHelper.getControlVariable().getDefaultDuration());
+                        List<Note> staffNotes = convertJianpuNote(keySplit[0], noteString, scorePropertyHelper.getControlVariable().getDefaultDuration(), isStaff);
                         for(Note staffNote: staffNotes){
                             if(notationHelper.isSlurStart()){
                                 Notations notations = new Notations();

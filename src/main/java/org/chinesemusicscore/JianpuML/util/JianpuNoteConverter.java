@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class JianpuNoteConverter {
-    public static List<Note> convertJianpuNote(String jpKey, String jianpuNote, String defaultNoteDuration) {
+    public static List<Note> convertJianpuNote(String jpKey, String jianpuNote, String defaultNoteDuration, boolean isStaff) {
         List<Note> notes = new ArrayList<>();
         if (jianpuNote.isEmpty()) {
             return notes;
@@ -46,7 +46,7 @@ public class JianpuNoteConverter {
                 Rest rest = new Rest();
                 tmpNote.setRest(rest);
             }else {
-                Pitch pitch = convert(jpKey, jpPitchSplit[i]);
+                Pitch pitch = convert(jpKey, jpPitchSplit[i], isStaff);
                 tmpNote.setPitch(pitch);
                 if(i>0){
                     tmpNote.setChord(new Empty());
@@ -59,7 +59,7 @@ public class JianpuNoteConverter {
         return notes;
     }
 
-    private static Pitch convert(String jpKey, String jianpuPitch){
+    private static Pitch convert(String jpKey, String jianpuPitch, boolean isStaff){
         Pitch pitch = new Pitch();
 
         if (jianpuPitch.matches("\\.*\\d\\.*[#b]?")) {
@@ -81,7 +81,13 @@ public class JianpuNoteConverter {
             jianpuPitch = jianpuPitch.substring(jianpuPitch.length() - 1);
         }
 
-        Pitch stdPitch = JianpuPitchUtil.getPitch(jpKey, jianpuPitch);
+        Pitch stdPitch;
+        if(isStaff){
+            stdPitch = JianpuPitchUtil.getPitch(jianpuPitch);
+            //todo 升降不对
+        }else {
+            stdPitch = JianpuPitchUtil.getPitch(jpKey, jianpuPitch);
+        }
 
         if(stdPitch!=null) {
             pitch.setStep(stdPitch.getStep());

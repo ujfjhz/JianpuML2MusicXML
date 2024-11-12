@@ -41,4 +41,14 @@ public class JianpuPitchUtil {
 
         return pitch;
     }
+
+    /**
+     * for staff notation in number form
+     * @param pitch
+     * @return
+     */
+    public static Pitch getPitch(String jpPitch){
+        Pitch pitch = CPitchMapping.getPitch(jpPitch);
+        return pitch;
+    }
 }
