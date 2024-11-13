@@ -10,6 +10,8 @@ import java.util.Map;
 public class DPitchMapping {
     private static Map<String, Pitch> pitchMap = new HashMap<>();
 
+    public static Map<String, BigDecimal> alterMap = new HashMap<>();
+
     static {
         Pitch d = new Pitch();
         d.setStep(Step.D);
@@ -26,6 +28,7 @@ public class DPitchMapping {
         fShap.setAlter(new BigDecimal("1"));
         fShap.setOctave(4);
         pitchMap.put("3",fShap);
+        alterMap.put(Step.F.name(), fShap.getAlter());
 
         Pitch g = new Pitch();
         g.setStep(Step.G);
@@ -47,9 +50,15 @@ public class DPitchMapping {
         cSharp.setAlter(new BigDecimal("1"));
         cSharp.setOctave(5);
         pitchMap.put("7",cSharp);
+        alterMap.put(Step.C.name(), cSharp.getAlter());
+
     }
 
     public static Pitch getPitch(String jpPitch){
         return pitchMap.get(jpPitch);
+    }
+
+    public static BigDecimal getAlter(String jpPitch){
+        return alterMap.get(jpPitch);
     }
 }

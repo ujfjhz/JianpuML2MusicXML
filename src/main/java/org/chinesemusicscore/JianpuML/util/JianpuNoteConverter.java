@@ -83,24 +83,23 @@ public class JianpuNoteConverter {
 
         Pitch stdPitch;
         if(isStaff){
-            stdPitch = JianpuPitchUtil.getPitch(jianpuPitch);
-            //todo 升降不对
+            stdPitch = JianpuPitchUtil.getStaffPitch(jpKey, jianpuPitch);
         }else {
             stdPitch = JianpuPitchUtil.getPitch(jpKey, jianpuPitch);
         }
 
         if(stdPitch!=null) {
             pitch.setStep(stdPitch.getStep());
+            pitch.setOctave(stdPitch.getOctave()+octaveDiff);
+            if (stdPitch.getAlter() != null) {
+                if (pitch.getAlter() == null) {
+                    pitch.setAlter(stdPitch.getAlter());
+                } else {
+                    pitch.getAlter().add(stdPitch.getAlter());
+                }
+            }
         }else {
             throw new RuntimeException("invalid pitch "+jianpuPitch);
-        }
-        pitch.setOctave(stdPitch.getOctave()+octaveDiff);
-        if (stdPitch.getAlter() != null) {
-            if (pitch.getAlter() == null) {
-                pitch.setAlter(stdPitch.getAlter());
-            } else {
-                pitch.getAlter().add(stdPitch.getAlter());
-            }
         }
 
         return pitch;

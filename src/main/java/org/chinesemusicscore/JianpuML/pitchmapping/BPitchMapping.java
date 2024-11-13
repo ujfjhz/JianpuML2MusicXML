@@ -10,6 +10,8 @@ import java.util.Map;
 public class BPitchMapping {
     private static Map<String, Pitch> pitchMap = new HashMap<>();
 
+    public static Map<String, BigDecimal> alterMap = new HashMap<>();
+
     static {
         Pitch b = new Pitch();
         b.setStep(Step.B);
@@ -21,12 +23,14 @@ public class BPitchMapping {
         cSharp.setAlter(new BigDecimal("1"));
         cSharp.setOctave(5);
         pitchMap.put("2",cSharp);
+        alterMap.put(Step.C.name(), cSharp.getAlter());
 
         Pitch dSharp = new Pitch();
         dSharp.setStep(Step.D);
         dSharp.setAlter(new BigDecimal("1"));
         dSharp.setOctave(5);
         pitchMap.put("3",dSharp);
+        alterMap.put(Step.D.name(), dSharp.getAlter());
 
         Pitch e = new Pitch();
         e.setStep(Step.E);
@@ -38,21 +42,28 @@ public class BPitchMapping {
         fShap.setAlter(new BigDecimal("1"));
         fShap.setOctave(5);
         pitchMap.put("5",fShap);
+        alterMap.put(Step.F.name(), fShap.getAlter());
 
         Pitch gShap = new Pitch();
         gShap.setStep(Step.G);
         gShap.setAlter(new BigDecimal("1"));
         gShap.setOctave(5);
         pitchMap.put("6",gShap);
+        alterMap.put(Step.G.name(), gShap.getAlter());
 
         Pitch aShap = new Pitch();
         aShap.setStep(Step.A);
         aShap.setAlter(new BigDecimal("1"));
         aShap.setOctave(5);
         pitchMap.put("7",aShap);
+        alterMap.put(Step.A.name(), aShap.getAlter());
     }
 
     public static Pitch getPitch(String jpPitch){
         return pitchMap.get(jpPitch);
+    }
+
+    public static BigDecimal getAlter(String jpPitch){
+        return alterMap.get(jpPitch);
     }
 }
