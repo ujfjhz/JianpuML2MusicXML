@@ -1,5 +1,5 @@
-*.jml
-*.musicxml
+input.jml
+output.musicxml
 output/
 
 HELP.md
